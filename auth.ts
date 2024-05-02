@@ -1,5 +1,7 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google';
+
 import { authConfig } from './auth.config'
 import { z } from 'zod'
 import { getStringFromBuffer } from './lib/utils'
@@ -40,6 +42,18 @@ export const { auth, signIn, signOut } = NextAuth({
 
         return null
       }
-    })
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      },
+    }),
   ]
 })
+

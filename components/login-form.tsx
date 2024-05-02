@@ -1,9 +1,9 @@
 'use client'
 
 import { useFormState, useFormStatus } from 'react-dom'
-import { authenticate } from '@/app/login/actions'
+import { authWithGoogle, authenticate } from '@/app/login/actions'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { IconSpinner } from './ui/icons'
 import { getMessageFromCode } from '@/lib/utils'
@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 export default function LoginForm() {
   const router = useRouter()
   const [result, dispatch] = useFormState(authenticate, undefined)
+  const [googleAuthResult, setGAuthResult] = useState<any>();
 
   useEffect(() => {
     if (result) {
@@ -24,7 +25,25 @@ export default function LoginForm() {
     }
   }, [result, router])
 
+  useEffect(() => {
+    if (googleAuthResult) {
+      console.log('Got to GAuthResult', googleAuthResult)
+      if (googleAuthResult.type === 'error') {
+        toast.error(getMessageFromCode(googleAuthResult.resultCode))
+      } else {
+        toast.success(getMessageFromCode(googleAuthResult.resultCode))
+        router.refresh()
+      }
+    }
+  }, [googleAuthResult, router])
+
+  const signInWithGoogle = async () => {
+    const result = await authWithGoogle();
+    setGAuthResult(result);
+  }
+
   return (
+    <>
     <form
       action={dispatch}
       className="flex flex-col items-center gap-4 space-y-3"
@@ -80,6 +99,10 @@ export default function LoginForm() {
         No account yet? <div className="font-semibold underline">Sign up</div>
       </Link>
     </form>
+    <div>
+      <button onClick={() => signInWithGoogle()}>sign in with gooogle</button>
+    </div>
+    </>
   )
 }
 

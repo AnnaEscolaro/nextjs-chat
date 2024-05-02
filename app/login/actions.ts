@@ -17,6 +17,31 @@ interface Result {
   resultCode: ResultCode
 }
 
+export async function authWithGoogle() {
+  try {
+      await signIn('google');
+      return {
+        type: 'success',
+        resultCode: ResultCode.UserLoggedIn
+      }
+  } catch (error) {    
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return {
+            type: 'error',
+            resultCode: ResultCode.InvalidCredentials
+          }
+        default:
+          return {
+            type: 'error',
+            resultCode: ResultCode.UnknownError
+          }
+      }
+    }
+  }
+}
+
 export async function authenticate(
   _prevState: Result | undefined,
   formData: FormData

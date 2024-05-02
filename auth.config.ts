@@ -7,7 +7,8 @@ export const authConfig = {
     newUser: '/signup'
   },
   callbacks: {
-    async authorized({ auth, request: { nextUrl } }) {
+    async authorized({ auth, request }) {
+      const { nextUrl } = request
       const isLoggedIn = !!auth?.user
       const isOnLoginPage = nextUrl.pathname.startsWith('/login')
       const isOnSignupPage = nextUrl.pathname.startsWith('/signup')
